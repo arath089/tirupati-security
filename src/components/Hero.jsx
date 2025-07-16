@@ -3,6 +3,8 @@ import { motion, useTransform, useScroll } from "framer-motion";
 
 const Hero = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const { scrollY } = useScroll();
 
   // Adjusted parallax transforms to prevent background exposure
@@ -39,26 +41,63 @@ const Hero = () => {
     }
   };
 
+  const handleVideoLoad = () => {
+    setVideoLoaded(true);
+    console.log("Video loaded successfully");
+  };
+
+  const handleVideoError = () => {
+    setVideoError(true);
+    console.error("Video failed to load");
+  };
+
   return (
     <section className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden text-white">
-      {/* Background Video with Parallax - Extended height to prevent gaps */}
-      <motion.video
-        className="absolute top-0 left-0 z-0 object-cover w-full min-h-[120vh]"
-        style={{ y: videoY, top: "-10vh" }}
-        autoPlay
-        loop
-        muted
-        playsInline
-      >
-        <source src="/videos/hero-background.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </motion.video>
+      {/* Background Video with Parallax */}
+      {!videoError && (
+        <motion.video
+          className="absolute top-0 left-0 z-0 object-cover w-full min-h-[120vh]"
+          style={{
+            y: videoY,
+            top: "-10vh",
+            opacity: videoLoaded ? 1 : 0,
+          }}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          onLoadedData={handleVideoLoad}
+          onError={handleVideoError}
+          onCanPlay={handleVideoLoad}
+        >
+          <source src="/videos/hero-background.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </motion.video>
+      )}
+
+      {/* Fallback background while video loads or if it fails */}
+      {(!videoLoaded || videoError) && (
+        <motion.div
+          className="absolute top-0 left-0 z-0 w-full min-h-[120vh] bg-gradient-to-br from-blue-900 via-gray-900 to-black"
+          style={{ y: videoY, top: "-10vh" }}
+        >
+          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:50px_50px]"></div>
+        </motion.div>
+      )}
 
       {/* Video Overlay with Dynamic Opacity */}
       <motion.div
         className="absolute top-0 left-0 z-10 w-full h-full bg-gray-800"
         style={{ opacity: overlayOpacity }}
       />
+
+      {/* Loading indicator */}
+      {!videoLoaded && !videoError && (
+        <div className="absolute z-20 px-3 py-1 text-sm text-white bg-black bg-opacity-50 rounded top-4 right-4">
+          Loading video...
+        </div>
+      )}
 
       {/* Main content with Parallax */}
       <motion.div
