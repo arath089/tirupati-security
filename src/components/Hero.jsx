@@ -52,7 +52,6 @@ const Hero = () => {
 
   const handleVideoLoad = () => {
     setVideoLoaded(true);
-    console.log("Video loaded successfully");
   };
 
   const handleVideoError = () => {
