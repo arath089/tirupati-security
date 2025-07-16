@@ -22,7 +22,7 @@ const Clients = () => {
       logo: "/images/clients/rspl-group.png",
     },
     {
-      name: "Paras Defence",
+      name: "Paras Dairy",
       description:
         "When it comes to securing our assets, we have trusted Tirupati Security for years. Mr. Rathi has always been a phone call away and has always satisfied our security needs. Throughout the years, he has become a part of our family.",
       testimonial: "Anil K. Upadhyay (President)",
@@ -30,7 +30,7 @@ const Clients = () => {
       logo: "/images/clients/paras-defence.png",
     },
     {
-      name: "Narayana Health",
+      name: "Narayana Education",
       description:
         "Tirupati Security has been always trusted with our educational institutes security. Their discipline and strictness has always impressed me.",
       testimonial: "Shweta Tiwari (Director)",

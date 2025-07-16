@@ -96,7 +96,7 @@ const About = () => {
                 transition={{ duration: 0.6, delay: 0.5 }}
                 viewport={{ once: true }}
               >
-                Professional Security Agency Since 2015
+                Professional Security Agency Since 2016
               </motion.h3>
 
               <motion.p
@@ -108,7 +108,7 @@ const About = () => {
               >
                 We are a professional security agency providing customized
                 security and training solutions to PSU's, Industries, Commercial
-                and Business houses. Founded in 2015, we strive to provide
+                and Business houses. Founded in 2016, we strive to provide
                 solutions to all the security needs of an establishment or
                 individuals.
               </motion.p>

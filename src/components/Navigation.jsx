@@ -149,14 +149,14 @@ const Navigation = () => {
   ];
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center px-6 py-2">
+    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center max-w-full px-4 py-2">
       <motion.nav
-        className="px-4 py-2 transition-all duration-300 border rounded-full shadow-lg md:px-10 backdrop-blur-md border-white/10 bg-gray-600/20"
+        className="max-w-full px-4 py-2 transition-all duration-300 border rounded-full shadow-lg md:px-10 backdrop-blur-md border-white/10 bg-gray-600/20"
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <div className="flex items-center justify-between max-w-6xl gap-6 mx-auto">
+        <div className="flex items-center justify-between max-w-6xl gap-4 mx-auto">
           {/* Logo */}
           <motion.div
             className="flex items-center space-x-4"
@@ -271,7 +271,7 @@ const Navigation = () => {
 
         {/* Mobile Menu */}
         <motion.div
-          className="absolute left-0 right-0 mt-3 bg-gray-800 rounded-xl md:hidden bg-opacity-95 backdrop-blur-lg"
+          className="absolute left-0 right-0 mt-5 bg-gray-800 rounded-xl md:hidden bg-opacity-95 backdrop-blur-lg"
           initial={{ opacity: 0, height: 0 }}
           animate={{
             opacity: isMobileMenuOpen ? 1 : 0,
