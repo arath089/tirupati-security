@@ -163,6 +163,18 @@ const Hero = () => {
         style={{ opacity: overlayOpacity, left: 0, right: 0 }}
       />
 
+      {/* Video Overlay with Dynamic Opacity - Desktop only */}
+      <motion.div
+        className="absolute top-0 left-0 z-10 hidden w-screen h-full bg-gray-800 md:block"
+        style={{ opacity: overlayOpacity, left: 0, right: 0 }}
+      />
+
+      {/* Mobile overlay - lighter or different styling */}
+      <motion.div
+        className="absolute top-0 left-0 z-10 w-screen h-full md:hidden"
+        style={{ left: 0, right: 0 }}
+      />
+
       {/* Mobile Play/Pause Control - Bottom Right */}
       {isMobile && videoLoaded && (
         <motion.div
