@@ -5,6 +5,8 @@ const Hero = () => {
   const [scrolled, setScrolled] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const { scrollY } = useScroll();
 
   // Adjusted parallax transforms to prevent background exposure
@@ -13,6 +15,13 @@ const Hero = () => {
   const contentY = useTransform(scrollY, [0, 500], [0, -100]);
 
   useEffect(() => {
+    // Detect mobile device
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    };
+
+    checkMobile();
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 100);
     };
@@ -51,16 +60,40 @@ const Hero = () => {
     console.error("Video failed to load");
   };
 
+  const handleVideoPlay = () => {
+    setVideoPlaying(true);
+  };
+
+  const tryPlayVideo = async () => {
+    const video = document.getElementById("hero-video-mobile");
+    if (video) {
+      try {
+        if (video.paused) {
+          await video.play();
+          setVideoPlaying(true);
+        } else {
+          video.pause();
+          setVideoPlaying(false);
+        }
+      } catch (error) {
+        console.log("Video control prevented:", error);
+      }
+    }
+  };
+
   return (
     <section className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden text-white">
       {/* Background Video with Parallax */}
-      {!videoError && (
+      {!videoError && !isMobile && (
         <motion.video
-          className="absolute top-0 left-0 z-0 object-cover w-full min-h-[120vh]"
+          id="hero-video"
+          className="absolute top-0 left-0 z-0 object-cover w-screen min-h-[120vh]"
           style={{
             y: videoY,
             top: "-10vh",
             opacity: videoLoaded ? 1 : 0,
+            left: 0,
+            right: 0,
           }}
           autoPlay
           loop
@@ -70,6 +103,32 @@ const Hero = () => {
           onLoadedData={handleVideoLoad}
           onError={handleVideoError}
           onCanPlay={handleVideoLoad}
+          onPlay={handleVideoPlay}
+        >
+          <source src="/videos/hero-background.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </motion.video>
+      )}
+
+      {/* Mobile Video - User initiated */}
+      {!videoError && isMobile && (
+        <motion.video
+          id="hero-video-mobile"
+          className="absolute top-0 left-0 z-0 object-cover w-screen min-h-[120vh]"
+          style={{
+            y: videoY,
+            top: "-10vh",
+            opacity: videoLoaded && videoPlaying ? 1 : 0,
+            left: 0,
+            right: 0,
+          }}
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          onLoadedData={handleVideoLoad}
+          onError={handleVideoError}
+          onPlay={handleVideoPlay}
         >
           <source src="/videos/hero-background.mp4" type="video/mp4" />
           Your browser does not support the video tag.
@@ -77,26 +136,72 @@ const Hero = () => {
       )}
 
       {/* Fallback background while video loads or if it fails */}
-      {(!videoLoaded || videoError) && (
+      {(!videoLoaded || videoError || (isMobile && !videoPlaying)) && (
         <motion.div
-          className="absolute top-0 left-0 z-0 w-full min-h-[120vh] bg-gradient-to-br from-blue-900 via-gray-900 to-black"
-          style={{ y: videoY, top: "-10vh" }}
+          className="absolute top-0 left-0 z-0 w-screen min-h-[120vh]"
+          style={{ y: videoY, top: "-10vh", left: 0, right: 0 }}
         >
-          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:50px_50px]"></div>
+          {/* Hero Background Image */}
+          <div
+            className="absolute inset-0 w-full h-full bg-center bg-no-repeat bg-cover"
+            style={{
+              backgroundImage: "url('/images/hero-background.jpg')",
+            }}
+          />
+
+          {/* Gradient Overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/80 via-gray-900/70 to-black/80" />
+
+          {/* Pattern Overlay for visual texture */}
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:50px_50px]"></div>
         </motion.div>
       )}
 
       {/* Video Overlay with Dynamic Opacity */}
       <motion.div
-        className="absolute top-0 left-0 z-10 w-full h-full bg-gray-800"
-        style={{ opacity: overlayOpacity }}
+        className="absolute top-0 left-0 z-10 w-screen h-full"
+        style={{ opacity: overlayOpacity, left: 0, right: 0 }}
       />
 
-      {/* Loading indicator */}
-      {!videoLoaded && !videoError && (
-        <div className="absolute z-20 px-3 py-1 text-sm text-white bg-black bg-opacity-50 rounded top-4 right-4">
-          Loading video...
-        </div>
+      {/* Mobile Play/Pause Control - Bottom Right */}
+      {isMobile && videoLoaded && (
+        <motion.div
+          className="absolute z-20 flex items-center justify-center w-12 h-12 bg-black rounded-full cursor-pointer bg-opacity-60 bottom-10 right-6"
+          onClick={(e) => {
+            e.stopPropagation();
+            tryPlayVideo();
+          }}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+            tryPlayVideo();
+          }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1, duration: 0.5 }}
+        >
+          {videoPlaying ? (
+            // Pause Icon - Centered
+            <svg
+              className="w-5 h-5 text-white"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+            </svg>
+          ) : (
+            // Play Icon - Centered with slight offset for visual balance
+            <svg
+              className="w-5 h-5 text-white"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              style={{ marginLeft: "1px" }}
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          )}
+        </motion.div>
       )}
 
       {/* Main content with Parallax */}
