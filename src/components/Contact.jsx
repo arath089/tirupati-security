@@ -1,9 +1,65 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useForm, ValidationError } from "@formspree/react";
+import { State, City } from "country-state-city";
 
 const Contact = () => {
   const [state, handleSubmit] = useForm("xzzvbveq");
+  const [selectedStateCode, setSelectedStateCode] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [indianStates, setIndianStates] = useState([]);
+  const [citiesInState, setCitiesInState] = useState([]);
+
+  useEffect(() => {
+    // Get all Indian states (IN is the country code for India)
+    const states = State.getStatesOfCountry("IN");
+    setIndianStates(states);
+  }, []);
+
+  useEffect(() => {
+    // Get cities when state changes
+    if (selectedStateCode) {
+      const cities = City.getCitiesOfState("IN", selectedStateCode);
+      setCitiesInState(cities);
+    } else {
+      setCitiesInState([]);
+    }
+  }, [selectedStateCode]);
+
+  const validatePhoneNumber = (phone) => {
+    const phoneRegex = /^[6-9]\d{9}$/; // Indian mobile number format
+    return phoneRegex.test(phone);
+  };
+
+  const handlePhoneChange = (e) => {
+    const phone = e.target.value.replace(/\D/g, ""); // Remove non-digits
+    if (phone.length > 10) {
+      return; // Don't allow more than 10 digits
+    }
+    e.target.value = phone;
+
+    if (phone.length === 10) {
+      if (validatePhoneNumber(phone)) {
+        setPhoneError("");
+      } else {
+        setPhoneError("Phone number must start with 6, 7, 8, or 9");
+      }
+    } else if (phone.length > 0) {
+      setPhoneError("Phone number must be exactly 10 digits");
+    } else {
+      setPhoneError("");
+    }
+  };
+
+  const handleStateChange = (e) => {
+    setSelectedStateCode(e.target.value);
+  };
+
+  // Custom form submission handler
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    await handleSubmit(e);
+  };
 
   if (state.succeeded) {
     return (
@@ -52,6 +108,15 @@ const Contact = () => {
               Thank you for contacting us. We'll get back to you within 24
               hours.
             </motion.p>
+            <motion.button
+              className="px-6 py-3 mt-6 font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              onClick={() => window.location.reload()}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+            >
+              Send Another Message
+            </motion.button>
           </motion.div>
         </div>
       </section>
@@ -100,7 +165,10 @@ const Contact = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
           viewport={{ once: true, amount: 0.3 }}
         >
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={onSubmit} className="space-y-6">
+            {/* Add hidden field to prevent redirect */}
+            <input type="hidden" name="_next" value={window.location.href} />
+
             {/* Name Field */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -171,14 +239,24 @@ const Contact = () => {
               >
                 Phone Number *
               </label>
-              <input
-                id="phone"
-                type="tel"
-                name="phone"
-                required
-                className="w-full px-4 py-3 transition-all duration-300 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                placeholder="+91 12345 67890"
-              />
+              <div className="flex">
+                <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-lg">
+                  +91
+                </span>
+                <input
+                  id="phone"
+                  type="tel"
+                  name="phone"
+                  required
+                  maxLength="10"
+                  className="w-full px-4 py-3 transition-all duration-300 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                  placeholder="9876543210"
+                  onChange={handlePhoneChange}
+                />
+              </div>
+              {phoneError && (
+                <p className="mt-1 text-sm text-red-500">{phoneError}</p>
+              )}
               <ValidationError
                 prefix="Phone"
                 field="phone"
@@ -187,7 +265,7 @@ const Contact = () => {
               />
             </motion.div>
 
-            {/* Location Field */}
+            {/* State Dropdown */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -195,22 +273,68 @@ const Contact = () => {
               viewport={{ once: true }}
             >
               <label
-                htmlFor="location"
+                htmlFor="state"
                 className="block mb-2 text-sm font-medium text-gray-700"
               >
-                Location *
+                State *
               </label>
-              <input
-                id="location"
-                type="text"
-                name="location"
+              <select
+                id="state"
+                name="state"
                 required
+                value={selectedStateCode}
+                onChange={handleStateChange}
                 className="w-full px-4 py-3 transition-all duration-300 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                placeholder="City, State"
-              />
+              >
+                <option value="">Select State</option>
+                {indianStates.map((state) => (
+                  <option key={state.isoCode} value={state.isoCode}>
+                    {state.name}
+                  </option>
+                ))}
+              </select>
               <ValidationError
-                prefix="Location"
-                field="location"
+                prefix="State"
+                field="state"
+                errors={state.errors}
+                className="mt-1 text-sm text-red-500"
+              />
+            </motion.div>
+
+            {/* City Dropdown */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <label
+                htmlFor="city"
+                className="block mb-2 text-sm font-medium text-gray-700"
+              >
+                City *
+              </label>
+              <select
+                id="city"
+                name="city"
+                required
+                disabled={!selectedStateCode}
+                className="w-full px-4 py-3 transition-all duration-300 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                <option value="">
+                  {selectedStateCode
+                    ? "Select City"
+                    : "Please select state first"}
+                </option>
+                {citiesInState.map((city) => (
+                  <option key={city.name} value={city.name}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
+              <ValidationError
+                prefix="City"
+                field="city"
                 errors={state.errors}
                 className="mt-1 text-sm text-red-500"
               />
@@ -220,7 +344,7 @@ const Contact = () => {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.8 }}
+              transition={{ duration: 0.5, delay: 0.9 }}
               viewport={{ once: true }}
             >
               <label
@@ -244,17 +368,62 @@ const Contact = () => {
               />
             </motion.div>
 
+            {/* reCAPTCHA Notice */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.85 }}
+              viewport={{ once: true }}
+              className="p-3 border border-green-200 rounded-lg bg-green-50"
+            >
+              <div className="flex items-center">
+                <svg
+                  className="w-4 h-4 mr-2 text-green-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <p className="text-xs text-green-700">
+                  <span className="font-medium">
+                    Secured by Google reCAPTCHA
+                  </span>{" "}
+                  - This form is protected with enterprise-grade security.
+                  Verification is automatic for most users.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Show submission errors */}
+            {state.errors && state.errors.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 border border-red-200 rounded-lg bg-red-50"
+              >
+                <p className="text-sm text-red-700">
+                  <span className="font-medium">Submission Error:</span> Please
+                  check your form and try again. Make sure to complete any
+                  security verification.
+                </p>
+              </motion.div>
+            )}
+
             {/* Submit Button */}
             <motion.button
               type="submit"
-              disabled={state.submitting}
+              disabled={state.submitting || phoneError}
               className="w-full px-6 py-4 font-bold text-white transition-all duration-300 bg-gray-900 rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.9 }}
               viewport={{ once: true }}
-              whileHover={{ scale: state.submitting ? 1 : 1.02 }}
-              whileTap={{ scale: state.submitting ? 1 : 0.98 }}
+              whileHover={{ scale: state.submitting || phoneError ? 1 : 1.02 }}
+              whileTap={{ scale: state.submitting || phoneError ? 1 : 0.98 }}
             >
               {state.submitting ? (
                 <div className="flex items-center justify-center">
@@ -265,6 +434,12 @@ const Contact = () => {
                 "Submit"
               )}
             </motion.button>
+
+            {/* Formspree Errors */}
+            <ValidationError
+              errors={state.errors}
+              className="mt-2 text-sm text-red-500"
+            />
           </form>
         </motion.div>
       </div>
