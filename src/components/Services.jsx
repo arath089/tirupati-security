@@ -10,6 +10,7 @@ const ServiceCard = ({
   index,
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -28,8 +29,22 @@ const ServiceCard = ({
     ["-17.5deg", "17.5deg"]
   );
 
+  // Detect mobile device
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+          window.innerWidth < 768
+      );
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const handleMouseMove = (e) => {
-    if (isFlipped) return;
+    if (isFlipped || isMobile) return; // Don't apply tilt on mobile
 
     const rect = e.currentTarget.getBoundingClientRect();
     const width = rect.width;
@@ -43,8 +58,10 @@ const ServiceCard = ({
   };
 
   const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
+    if (!isMobile) {
+      x.set(0);
+      y.set(0);
+    }
   };
 
   const handleFlip = () => {
@@ -87,7 +104,7 @@ const ServiceCard = ({
           style={{
             transformStyle: "preserve-3d",
             height: "480px",
-            ...(isFlipped
+            ...(isFlipped || isMobile
               ? {}
               : {
                   rotateX: rotateX,
