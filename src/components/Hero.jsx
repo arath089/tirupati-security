@@ -202,7 +202,7 @@ const Hero = () => {
               <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
             </svg>
           ) : (
-            // Play Icon - Centered with slight offset for visual balance
+            // Play Icon : Centered with slight offset for visual balance
             <svg
               className="w-5 h-5 text-white"
               fill="currentColor"
