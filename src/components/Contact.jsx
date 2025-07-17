@@ -5,10 +5,47 @@ import { State, City } from "country-state-city";
 
 const Contact = () => {
   const [state, handleSubmit] = useForm("xzzvbveq");
-  const [selectedStateCode, setSelectedStateCode] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [selectedStateCode, setSelectedStateCode] = useState("");
   const [indianStates, setIndianStates] = useState([]);
   const [citiesInState, setCitiesInState] = useState([]);
+  const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
+  const [recaptchaValue, setRecaptchaValue] = useState(null);
+
+  // Use your reCAPTCHA v2 site key
+  const RECAPTCHA_SITE_KEY = "6Lcn4YUrAAAAAO5yPIPc5vJZJaU8lNtA7hGnmnr9";
+
+  // Check if reCAPTCHA is loaded
+  useEffect(() => {
+    const checkRecaptcha = () => {
+      if (window.grecaptcha && window.grecaptcha.render) {
+        setRecaptchaLoaded(true);
+      } else {
+        setTimeout(checkRecaptcha, 100);
+      }
+    };
+
+    checkRecaptcha();
+  }, []);
+
+  // Render reCAPTCHA when loaded
+  useEffect(() => {
+    if (recaptchaLoaded) {
+      try {
+        window.grecaptcha.render("recaptcha-container", {
+          sitekey: RECAPTCHA_SITE_KEY,
+          callback: (response) => {
+            setRecaptchaValue(response);
+          },
+          "expired-callback": () => {
+            setRecaptchaValue(null);
+          },
+        });
+      } catch (error) {
+        console.error("reCAPTCHA render error:", error);
+      }
+    }
+  }, [recaptchaLoaded]);
 
   useEffect(() => {
     // Get all Indian states (IN is the country code for India)
@@ -55,10 +92,20 @@ const Contact = () => {
     setSelectedStateCode(e.target.value);
   };
 
-  // Custom form submission handler
   const onSubmit = async (e) => {
     e.preventDefault();
-    await handleSubmit(e);
+
+    // Check if reCAPTCHA is completed
+    if (!recaptchaValue) {
+      alert("Please complete the reCAPTCHA verification");
+      return;
+    }
+
+    try {
+      await handleSubmit(e);
+    } catch (error) {
+      console.error("Form submission error:", error);
+    }
   };
 
   if (state.succeeded) {
@@ -165,10 +212,12 @@ const Contact = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
           viewport={{ once: true, amount: 0.3 }}
         >
-          <form onSubmit={onSubmit} className="space-y-6">
-            {/* Add hidden field to prevent redirect */}
-            <input type="hidden" name="_next" value={window.location.href} />
-
+          <form
+            onSubmit={onSubmit}
+            method="POST"
+            action="https://formspree.io/f/xzzvbveq"
+            className="space-y-6"
+          >
             {/* Name Field */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -239,21 +288,16 @@ const Contact = () => {
               >
                 Phone Number *
               </label>
-              <div className="flex">
-                <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-lg">
-                  +91
-                </span>
-                <input
-                  id="phone"
-                  type="tel"
-                  name="phone"
-                  required
-                  maxLength="10"
-                  className="w-full px-4 py-3 transition-all duration-300 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                  placeholder="9876543210"
-                  onChange={handlePhoneChange}
-                />
-              </div>
+              <input
+                id="phone"
+                type="text"
+                name="phone"
+                required
+                maxLength="10"
+                className="w-full px-4 py-3 transition-all duration-300 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                placeholder="9876543210 (10 digits)"
+                onChange={handlePhoneChange}
+              />
               {phoneError && (
                 <p className="mt-1 text-sm text-red-500">{phoneError}</p>
               )}
@@ -293,6 +337,15 @@ const Contact = () => {
                   </option>
                 ))}
               </select>
+              {/* Hidden field to send readable state name */}
+              <input
+                type="hidden"
+                name="state_name"
+                value={
+                  indianStates.find((s) => s.isoCode === selectedStateCode)
+                    ?.name || ""
+                }
+              />
               <ValidationError
                 prefix="State"
                 field="state"
@@ -368,11 +421,22 @@ const Contact = () => {
               />
             </motion.div>
 
-            {/* reCAPTCHA Notice */}
+            {/* reCAPTCHA v2 Widget */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.85 }}
+              viewport={{ once: true }}
+              className="flex justify-center"
+            >
+              <div id="recaptcha-container"></div>
+            </motion.div>
+
+            {/* reCAPTCHA Info Notice */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.9 }}
               viewport={{ once: true }}
               className="p-3 border border-green-200 rounded-lg bg-green-50"
             >
@@ -389,34 +453,41 @@ const Contact = () => {
                   />
                 </svg>
                 <p className="text-xs text-green-700">
-                  <span className="font-medium">
-                    Secured by Google reCAPTCHA
-                  </span>{" "}
-                  - This form is protected with enterprise-grade security.
-                  Verification is automatic for most users.
+                  <span className="font-medium">Protected by reCAPTCHA:</span>{" "}
+                  Please complete the verification above to submit your message.
                 </p>
               </div>
             </motion.div>
 
-            {/* Show submission errors */}
+            {/* Display any errors */}
             {state.errors && state.errors.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-3 border border-red-200 rounded-lg bg-red-50"
+                className="p-4 border border-red-200 rounded-lg bg-red-50"
               >
-                <p className="text-sm text-red-700">
-                  <span className="font-medium">Submission Error:</span> Please
-                  check your form and try again. Make sure to complete any
-                  security verification.
-                </p>
+                <h4 className="font-medium text-red-800">Submission Error:</h4>
+                <div className="mt-1 text-sm text-red-700">
+                  {state.errors.map((error, index) => (
+                    <p key={index}>
+                      {error.field
+                        ? `${error.field}: ${error.message}`
+                        : error.message || JSON.stringify(error)}
+                    </p>
+                  ))}
+                </div>
               </motion.div>
             )}
 
             {/* Submit Button */}
             <motion.button
               type="submit"
-              disabled={state.submitting || phoneError}
+              disabled={
+                state.submitting ||
+                phoneError ||
+                !selectedStateCode ||
+                !recaptchaValue
+              }
               className="w-full px-6 py-4 font-bold text-white transition-all duration-300 bg-gray-900 rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -435,11 +506,28 @@ const Contact = () => {
               )}
             </motion.button>
 
-            {/* Formspree Errors */}
-            <ValidationError
-              errors={state.errors}
-              className="mt-2 text-sm text-red-500"
-            />
+            {/* reCAPTCHA branding (required by Google) */}
+            <div className="text-xs text-center text-gray-500">
+              This site is protected by reCAPTCHA and the Google{" "}
+              <a
+                href="https://policies.google.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                Privacy Policy
+              </a>{" "}
+              and{" "}
+              <a
+                href="https://policies.google.com/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                Terms of Service
+              </a>{" "}
+              apply.
+            </div>
           </form>
         </motion.div>
       </div>
