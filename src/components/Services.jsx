@@ -370,18 +370,6 @@ const Services = () => {
           ))}
         </div>
       </div>
-
-      <style jsx>{`
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-        .preserve-3d {
-          transform-style: preserve-3d;
-        }
-        .backface-hidden {
-          backfacevisibility: hidden;
-        }
-      `}</style>
     </section>
   );
 };

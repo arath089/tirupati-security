@@ -10,49 +10,81 @@ Welcome to the official website for **Tirupati Security Services**, a trusted na
 
 Whether it's 24/7 coverage or event-based protection, Tirupati Security tailors its services to meet your security needs with professionalism and dedication.
 
-## 🌟 Services Offered
-
-- 🔒 **Security Guards** - Static and mobile security personnel
-- 🛡️ **Gunmen Services** - Armed security for high-risk situations
-- 👩‍💼 **Lady Guards** - Female security specialists for sensitive environments
-- 📋 **Supervisors** - Management personnel for security operations
-- 🧹 **Housekeeping Services** - Professional cleaning and maintenance
-
-## 🏢 Our Clients
-
-We proudly serve some of the most respected organizations including:
-
-- Sahara India Pariwar
-- RSPL Group
-- Paras Dairy
-- Narayana Education
-- Trident Auto Components
-- SNG Solvents Private Ltd.
-- Vaibhav Edibles Pvt. Ltd.
-
 ## 🛠️ Tech Stack
 
-### Built With:
+### Core Technologies:
 
-- ⚡ [Vite](https://vitejs.dev/) — Lightning-fast build tool and dev server
-- ⚛️ [React](https://reactjs.org/) — Modern JavaScript library for building user interfaces
-- 🎨 [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework for rapid UI development
-- 🎞️ [Framer Motion](https://www.framer.com/motion/) — Production-ready motion library for React
-- 📊 [Vercel Analytics](https://vercel.com/analytics) — Web analytics for performance insights
-- 📧 [Formspree](https://formspree.io/) — Form backend for contact submissions
-- ✨ Hosted on [Vercel](https://vercel.com/) and version-controlled via [GitHub](https://github.com/arath089/tirupati-security)
+- ⚡ **[Vite](https://vitejs.dev/)** `^6.2.0` — Lightning-fast build tool with HMR and ES modules
+- ⚛️ **[React](https://reactjs.org/)** `^18.3.1` — Modern declarative UI library with hooks
+- 🎨 **[Tailwind CSS](https://tailwindcss.com/)** `^3.4.3` — Utility-first CSS framework
+- 🎞️ **[Framer Motion](https://www.framer.com/motion/)** `^11.11.17` — Production-ready motion library
 
-## 🚀 Features
+### Additional Libraries:
 
-- **Responsive Design** - Optimized for all devices (desktop, tablet, mobile)
-- **Interactive Animations** - Smooth transitions and engaging micro-interactions
-- **Video Background** - Professional hero section with fallback support
-- **3D Card Effects** - Interactive service cards with flip animations
-- **Contact Forms** - Integrated contact system with validation
-- **Client Testimonials** - Showcase of satisfied customers
-- **Performance Optimized** - Fast loading times and SEO-friendly
+- 📧 **[Formspree React](https://formspree.io/)** `^2.5.1` — Form backend with React hooks
+- 🌍 **[Country State City](https://www.npmjs.com/package/country-state-city)** `^3.2.1` — Geographic data for forms
+- 📊 **[Vercel Analytics](https://vercel.com/analytics)** `^1.5.0` — Performance monitoring
 
-## 📋 Installation & Setup
+### Development Dependencies:
+
+- 🛠️ **[TypeScript Types](https://www.typescriptlang.org/)** — Type definitions for React & React DOM
+- ⚡ **[Vite React Plugin](https://github.com/vitejs/vite/tree/main/packages/plugin-react)** — Fast refresh & JSX transform
+- 🎨 **[PostCSS](https://postcss.org/)** `^8.5.3` — CSS post-processing
+- 🔧 **[Autoprefixer](https://autoprefixer.github.io/)** `^10.4.21` — CSS vendor prefixing
+
+## 🏗️ Architecture & Structure
+
+```
+src/
+├── components/           # React components
+│   ├── About.jsx        # Company information
+│   ├── Contact.jsx      # Contact form with reCAPTCHA
+│   ├── Footer.jsx       # Site footer
+│   ├── Hero.jsx         # Hero section with video
+│   ├── Licensing.jsx    # Legal credentials
+│   ├── Navigation.jsx   # Responsive navigation
+│   ├── Partners.jsx     # Client testimonials
+│   ├── Services.jsx     # Service offerings
+│   └── Testimonials.jsx # Stats & testimonials
+├── App.jsx              # Main app component
+├── main.jsx             # React entry point
+└── style.css            # Global styles & Tailwind
+```
+
+## 🚀 Features & Technical Implementation
+
+### 🎨 **Modern UI/UX**
+
+- **Responsive Design**: Mobile-first approach with Tailwind breakpoints
+- **Smooth Animations**: Framer Motion for entrance animations and interactions
+- **3D Effects**: CSS transforms for interactive service cards
+
+### 📱 **Mobile Optimization**
+
+- **Touch Interactions**: Optimized for mobile gestures
+- **Video Handling**: Adaptive video playback with user controls
+- **Performance**: Lazy loading and optimized asset delivery
+
+### 🎥 **Media & Assets**
+
+- **Video Background**: Hero section with fallback image support
+- **Responsive Images**: Multiple sizes for different devices
+
+### 📋 **Form Technology**
+
+- **Formspree Integration**: Serverless form handling
+- **reCAPTCHA v2**: Google spam protection
+- **Real-time Validation**: Phone number and email validation
+- **Geographic Data**: Indian states and cities dropdown
+- **Error Handling**: Comprehensive form error states
+
+### 🔒 **Security Features**
+
+- **reCAPTCHA Protection**: Prevents spam submissions
+- **Input Sanitization**: Client-side validation
+- **HTTPS Enforcement**: Secure data transmission
+
+### Setup
 
 ```bash
 # Clone the repository
@@ -74,38 +106,27 @@ yarn build
 yarn preview
 ```
 
-## 📊 Performance & Analytics
+## 📍 Location & Contact
 
-- **Vercel Analytics** integrated for performance monitoring
-- **Optimized images** with proper compression and formats
-- **Lazy loading** for better initial page load times
-- **SEO optimized** with proper meta tags and structure
-
-## 📍 Location & Coverage
-
-**Headquarters:** 6A, Industrial Area, Fazalganj, Kanpur, Uttar Pradesh, India 🇮🇳
-
-**Service Areas:**
-
-- Kanpur and surrounding districts
-- Uttar Pradesh region
-- Available for inter-state projects
-
-**Specializing in:**
-
-- Residential societies and gated communities
-- Corporate offices and business parks
-- Construction sites and industrial facilities
-- Banks and financial institutions
-- Private events and functions
+- **Development**: Vancouver, Canada 🇨🇦
+- **Business**: Kanpur, India 🇮🇳
+- **Repository**: [GitHub](https://github.com/arath089/tirupati-security)
 
 ## 🧑‍💻 Development Team
 
-This project is built and maintained by **Archit Rathi** — a frontend developer and proud son of the founder 🙌
+**Archit Rathi** — Frontend Developer & Solutions Architect
+
+- 🌐 Portfolio: [architrathi.ca](https://architrathi.ca)
+- 💼 Vancouver, Canada
+- 🎯 Specializing in React, TypeScript, and modern web technologies working currently as an Intermediate Software Developer at The Beyond Group, LA.
 
 ## 🤝 Contributing
 
-While this is a company website, suggestions and feedback are welcome. Please feel free to reach out through our contact form or GitHub issues.
+While this is a company website, suggestions and technical feedback are welcome:
+
+1. **Issues**: Report bugs or suggest features via GitHub Issues
+2. **Pull Requests**: Technical improvements welcome
+3. **Contact**: Reach out through our contact form
 
 ## 📄 License
 
@@ -113,6 +134,4 @@ This project is proprietary software belonging to Tirupati Security Services Pvt
 
 ---
 
-_Protecting what matters most since 2016_ 🛡️
-
-**Built with ❤️ in Kanpur, India**
+**Built with ❤️ using modern web technologies**
